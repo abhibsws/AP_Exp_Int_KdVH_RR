@@ -4,7 +4,7 @@ Tau = [1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8];
 %Tau = [1e-2, 1e-3]; 
 
 % -------- Choose ONE method here --------
- Mthd_name = 'Lawson2b';
+%  Mthd_name = 'Lawson2b';
 % Mthd_name = 'Lawson4';
 % Mthd_name = 'ETD2RK';
 % Mthd_name = 'ETD3RK';
@@ -75,20 +75,33 @@ tiledlayout(1,3,'TileSpacing','compact','Padding','compact');
 for comp = 1:3
     nexttile; hold on;
 
+    % marker style
+    colors = lines(length(Tau));
+    markers = {'o','s','^','d','v','>','<','p','h','x','+'};
+    lineStyles = {'-','--','-.'};
     colors = lines(length(Tau));
     all_err = [];
 
-    % ---- Plot curves ----
+% ---- Plot curves ----
     for i = 1:length(Tau)
         err_vals = Err{i}(comp,:);
         all_err = [all_err, err_vals];
 
-        plot(dts{i}, err_vals, '-o', ...
+        mk = markers{mod(i-1,length(markers)) + 1};
+        ls = lineStyles{mod(i-1,length(lineStyles)) + 1};
+
+        plot(dts{i}, err_vals, ...
+            'LineStyle', '-', ...
+            'Marker', mk, ...
             'Color', colors(i,:), ...
+            'MarkerEdgeColor', colors(i,:), ...
             'MarkerFaceColor', colors(i,:), ...
+            'MarkerSize', 7, ...
             'LineWidth', 1.5, ...
-            'DisplayName', sprintf('\\tau = 10^{%d}', round(log10(Tau(i)))));
+            'DisplayName', sprintf('\\tau = 10^{%d}', ...
+            round(log10(Tau(i)))));
     end
+
     % ---- Tight limits ----
     ylim([0.8*min(all_err), 1.2*max(all_err)]);
 
@@ -109,7 +122,7 @@ for comp = 1:3
 
     plot(ref_dt_mid, ref_line, ':k', ...
         'LineWidth', 3, ...
-        'DisplayName', sprintf('O(\\Deltat^{%d})', P));
+        'DisplayName', sprintf('O(\\Delta t^{%d})', P));
 
     set(gca, 'XScale','log','YScale','log', ...
         'FontSize',15,'LineWidth',1.2);
@@ -121,9 +134,11 @@ for comp = 1:3
         ylabel('Error','FontSize',16);
         legend('Location','best','FontSize',13);
         title('Convergence for $u$','Interpreter','latex');
+
     elseif comp == 2
         title('Convergence for $v$','Interpreter','latex');
         set(gca,'YTickLabel',[]);
+
     else
         title('Convergence for $w$','Interpreter','latex');
         set(gca,'YTickLabel',[]);
